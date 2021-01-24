@@ -14,7 +14,6 @@ int main() {
     int uncompressedSize;
     int compressedSize;
     int decompressedSize;
-    //C:\Users\natha\CLionProjects\untitled3\data.txt
     string uncompressedPath = "", compressedPath = "", decompressedPath = "";
     int8_t * uncompressedBuffer;
     int8_t * compressedBuffer;

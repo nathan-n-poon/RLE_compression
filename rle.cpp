@@ -1,12 +1,19 @@
 //
-// Created by natha on 2021-01-23.
+// Created by nathan on 2021-01-23.
 //
 #include "rle.h"
 
-//helper function for insertion
+//helper function for inserting a run into the original array
+//arguments:
+//  trendCount: the length of a run of the same number. will be reset by this function
+//  source: the array in which we are inserting the compressed run
+//  insertPos: where in the array we should begin inserting the run. will be altered by the function to be after the newly inserted run
+//  trend: the value of a run
+//  insertion: value to be inserted if we are not on a run
 void insert(int & trendCount, int8_t source[], int & insertPos, int8_t & trend, int8_t & insertion)
 {
-    if(trendCount > 1)  //if a run was ended, insert length of run, dented by negative sign, followed by the value in the run
+    //if a run was ended, insert length of run, dented by negative sign, followed by the value in the run
+    if(trendCount > 1)
     {
         while(trendCount > 127) // deal with the case where there exist more than 127 contiguous copies of the same value
         {
@@ -14,10 +21,10 @@ void insert(int & trendCount, int8_t source[], int & insertPos, int8_t & trend, 
             trendCount -= 127;
             insertPos += 1;
         }
-        source[insertPos] = -1 * trendCount; // insert length of run as negative number
+        source[insertPos] = -1 * trendCount; // insert remaining length of run as negative number
         source[insertPos + 1] = trend; //now insert the actual repeated value
-        trendCount = 1; //reset the count
-        insertPos += 2; // increment insertion positipn for the length and the value
+        trendCount = 1;
+        insertPos += 2; // increment insertion position for the length and the value
     }
     else  //otherwise, if  we are not currently on a run, insert the last seen element
     {
@@ -27,6 +34,12 @@ void insert(int & trendCount, int8_t source[], int & insertPos, int8_t & trend, 
     }
 }
 
+//rle compression algorithm
+//arguments:
+//  data_ptr: pointer to bytes
+//  data_size: size of array
+//returns:
+//  int: length of new array
 int compress(int8_t *data_ptr, int data_size)
 {
     int trendCount = 0;       //length of a run of the same value
@@ -51,22 +64,23 @@ int compress(int8_t *data_ptr, int data_size)
         trend = data_ptr[i];  //update trend
     }
 
-//    if((insertPos + (data_size / 127)) < data_size) //if we have room at end (most times we will), insert length of original array (as a negative int) at end of our compressed array. This will help with decompression later.
-//    {
-////        cout << "hello \n";
-//        int8_t x = -1;
-//        insert(data_size, data_ptr, insertPos, x, x); //this -1 is a dummy, we cleave it off the size at the end
-//        insertPos--;
-//    }
     return insertPos;
 }
 
-//takes the compressed array, its size, and where to decompress into (no in place decompression, sorry :p)
+//decompresses my compressed array
+//arguments:
+//  data_ptr: the compressed array
+//  size: the length of the compressed array
+//  sink: where to decompress into (not in place compression)
+//returns:
+//  int: size of decompressed array
 int decompress(int8_t * data_ptr, int size, int8_t *& sink)
 {
     int insertPos = 0;
     int origSize = 0;
 
+    //determine size of original array, by adding all the lengths together
+    //needed to allocate enough space for decompressed array
     for(int i = 0; i < size; i++) {
         if(data_ptr[i] >= 0) {
             origSize++;
@@ -78,13 +92,11 @@ int decompress(int8_t * data_ptr, int size, int8_t *& sink)
             }
         }
     }
+    sink = new int8_t[origSize];
 
-
-    sink = new int8_t[origSize]; //allocate the new array
     bool endOfLength = false;       //this indicates whether or not we have just finished retrieving the length of a run
     for(int i = 0; i < size; i++)
     {
-
         if(data_ptr[i] < 0) // if a length
         {
             endOfLength = true;
