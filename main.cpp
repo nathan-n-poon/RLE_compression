@@ -19,6 +19,14 @@ int main() {
     int8_t * compressedBuffer;
     int8_t * decompressedBuffer;
     int8_t * temp;
+    std::cout << "Start by creating a text file with the uncompressed array in it. Each byte should be separated by a single comma.\n" 
+    "ie: 1,1,1,2,3,4,51,2,12,114,12,21,21,21,8\n"
+    "Then supply the path to your text file using option 1. ie: C:\\Users\\nathan\\CLionProjects\\RLE_compression\\data.txt\n"
+    "Also assign the paths to where the compressed array should be written to as well as the decompressed array\n"
+    "Then compress the array with option 4. This will write the compressed array into the compressed file path.\n"
+    "To decompress the array, slect option 5, which will write the decompressed array into the decompressed file path\n"
+    "to verify the uncompressed and decompressed arrays are equal choose option 6. It will also tell you how many bytes are saved\n"
+    "-------------------------------------------------------------------------------------------------------------------------------\n\n\n";
     while(1) {
         int menuChoice;
         cout << "[1] set uncompressed file path \n[2] set compressed file path \n[3] set decompressed file path \n"
